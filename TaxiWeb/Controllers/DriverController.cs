@@ -1,4 +1,5 @@
-﻿using Contracts.Logic;
+﻿using Contracts.Email;
+using Contracts.Logic;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -15,11 +16,13 @@ namespace TaxiWeb.Controllers
     [ApiController]
     public class DriverController : ControllerBase
     {
-        private readonly IBussinesLogic authService;
+        private readonly IBussinesLogic logicService;
+        private readonly IEmailService emailService;
         private readonly IRequestAuth requestAuth;
-        public DriverController(IBussinesLogic authService, IRequestAuth requestAuth)
+        public DriverController(IBussinesLogic logicService, IEmailService emailService, IRequestAuth requestAuth)
         {
-            this.authService = authService;
+            this.logicService = logicService;
+            this.emailService = emailService;
             this.requestAuth = requestAuth;
         }
 
@@ -34,7 +37,7 @@ namespace TaxiWeb.Controllers
                 return Unauthorized();
             }
 
-            var driverStatus = await authService.GetDriverStatus(driverId);
+            var driverStatus = await logicService.GetDriverStatus(driverId);
 
             return Ok(driverStatus);
         }
@@ -52,11 +55,11 @@ namespace TaxiWeb.Controllers
                 return Unauthorized();
             }
 
-            var result = await authService.UpdateDriverStatus(driverId, updateData.Status);
+            var result = await logicService.UpdateDriverStatus(driverId, updateData.Status);
 
             if (result)
             {
-                await authService.SendEmail(new Models.Email.SendEmailRequest()
+                await emailService.SendEmail(new Models.Email.SendEmailRequest()
                 {
                     Body = $"Your status on TaxiWeb application has been changed to {updateData.Status.ToString()}",
                     // TO DO: Change to driver's email
@@ -79,7 +82,7 @@ namespace TaxiWeb.Controllers
                 return Unauthorized();
             }
 
-            return Ok(await authService.ListAllDrivers());
+            return Ok(await logicService.ListAllDrivers());
         }
 
         [HttpPost]
@@ -93,10 +96,10 @@ namespace TaxiWeb.Controllers
                 return Unauthorized();
             }
             driverRating.Id = Guid.NewGuid();
-            return Ok(await authService.RateDriver(driverRating));
+            return Ok(await logicService.RateDriver(driverRating));
         }
 
-        [HttpPost]
+        [HttpGet]
         [Authorize]
         [Route("avg-rating-driver/{driverId}")]
         public async Task<IActionResult> AverageRatingDriver(Guid driverId)
@@ -109,7 +112,7 @@ namespace TaxiWeb.Controllers
                 return Unauthorized();
             }
 
-            return Ok(await authService.GetAverageRatingForDriver(driverId));
+            return Ok(await logicService.GetAverageRatingForDriver(driverId));
         }
     }
 }

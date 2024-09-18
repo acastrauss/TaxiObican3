@@ -1,6 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <StartupServices xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://schemas.microsoft.com/2011/01/fabric">
   <Parameters>
+    <Parameter Name="TaxiEmail_InstanceCount" Value="-1" />
+    <Parameter Name="TaxiAuth_InstanceCount" Value="-1" />
     <Parameter Name="TaxiData_PartitionCount" Value="1" />
     <Parameter Name="TaxiData_MinReplicaSetSize" Value="3" />
     <Parameter Name="TaxiData_TargetReplicaSetSize" Value="3" />

@@ -7,7 +7,7 @@ using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Contracts.Logic
+namespace Contracts.Auth
 {
     [ServiceContract]
 

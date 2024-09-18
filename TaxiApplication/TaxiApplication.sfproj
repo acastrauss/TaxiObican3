@@ -36,8 +36,10 @@
     <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\TaxiAuth\TaxiAuth.csproj" />
     <ProjectReference Include="..\TaxiData\TaxiData.csproj" />
     <ProjectReference Include="..\BussinesLogic\BussinesLogic.csproj" />
+    <ProjectReference Include="..\TaxiEmail\TaxiEmail.csproj" />
     <ProjectReference Include="..\TaxiWeb\TaxiWeb.csproj">
       <ServiceLaunchUrl>http://localhost:{ServicePort}/weatherforecast</ServiceLaunchUrl>
     </ProjectReference>

@@ -14,7 +14,7 @@ using Contracts.Email;
 namespace Contracts.Logic
 {
     [ServiceContract]
-    public interface IBussinesLogic : IAuthLogic, IDriverLogic, IRideLogic, IEmailService, IRatingLogic
+    public interface IBussinesLogic : IDriverLogic, IRideLogic, IRatingLogic
     {
     }
 }

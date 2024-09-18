@@ -1,4 +1,4 @@
-﻿using Contracts.Logic;
+﻿using Contracts.Auth;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -20,11 +20,11 @@ namespace TaxiWeb.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly IBussinesLogic authService;
+        private readonly IAuthLogic authService;
         private readonly IOptions<JWTConfig> jwtConfig;
         private readonly IRequestAuth requestAuth;
 
-        public AuthController(IBussinesLogic authService, IOptions<JWTConfig> jwtConfig, IRequestAuth requestAuth)
+        public AuthController(IAuthLogic authService, IOptions<JWTConfig> jwtConfig, IRequestAuth requestAuth)
         {
             this.authService = authService;
             this.jwtConfig = jwtConfig;

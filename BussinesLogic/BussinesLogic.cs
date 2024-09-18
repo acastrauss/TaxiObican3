@@ -24,24 +24,17 @@ namespace BussinesLogic
     /// </summary>
     internal sealed class BussinesLogic : StatelessService, IBussinesLogic
     {
-        private IEmailService emailService;
-
-        private IAuthLogic authLogic;
         private IDriverLogic driverLogic;
         private IRideLogic rideLogic;
         private IRatingLogic ratingLogic;
         public BussinesLogic(
             StatelessServiceContext context, 
-            IEmailService emailService,
-            IAuthLogic authLogic,
             IDriverLogic driverLogic,
             IRideLogic rideLogic,
             IRatingLogic ratingLogic
             )
             : base(context)
         {
-            this.emailService = emailService;
-            this.authLogic = authLogic;
             this.driverLogic = driverLogic;
             this.rideLogic = rideLogic;
             this.ratingLogic = ratingLogic;
@@ -62,30 +55,6 @@ namespace BussinesLogic
         public async Task<IEnumerable<Driver>> ListAllDrivers()
         {
             return await driverLogic.ListAllDrivers();
-        }
-
-        #endregion
-
-        #region AuthMethods
-
-        public async Task<LoginResponse> Login(LoginData loginData)
-        {
-            return await authLogic.Login(loginData);
-        }
-
-        public async Task<bool> Register(UserProfile userProfile)
-        {
-            return await authLogic.Register(userProfile);
-        }
-
-        public async Task<UserProfile> GetUserProfile(Guid id)
-        {
-            return await authLogic.GetUserProfile(id);
-        }
-
-        public async Task<UserProfile> UpdateUserProfile(UpdateUserProfileRequest updateUserProfileRequest, Guid id)
-        {
-            return await authLogic.UpdateUserProfile(updateUserProfileRequest, id);
         }
 
         #endregion
@@ -156,16 +125,6 @@ namespace BussinesLogic
         {
             return await rideLogic.GetRideStatus(rideId);
         }
-        #endregion
-
-        #region EmailMethods
-
-        public async Task<bool> SendEmail(SendEmailRequest sendEmailRequest)
-        {
-            return await emailService.SendEmail(sendEmailRequest);
-        }
-
-
         #endregion
 
         #region DriverRatingMethods

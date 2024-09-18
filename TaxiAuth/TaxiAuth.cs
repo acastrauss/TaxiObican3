@@ -1,21 +1,32 @@
-﻿using Models.Auth;
-using Models.UserTypes;
 using System;
 using System.Collections.Generic;
+using System.Fabric;
 using System.Linq;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using Contracts.Auth;
+using Microsoft.ServiceFabric.Services.Communication.Runtime;
+using Microsoft.ServiceFabric.Services.Remoting.Runtime;
+using Microsoft.ServiceFabric.Services.Runtime;
+using Models.Auth;
+using Models.UserTypes;
 
-namespace BussinesLogic.Implementations
+namespace TaxiAuth
 {
-    internal class AuthLogic : Contracts.Logic.IAuthLogic
+    /// <summary>
+    /// An instance of this class is created for each service instance by the Service Fabric runtime.
+    /// </summary>
+    internal sealed class TaxiAuth : StatelessService, IAuthLogic
     {
-        private Contracts.Database.IData dbService;
+        private readonly Contracts.Database.IData dbService;
 
-        public AuthLogic(Contracts.Database.IData dbService) 
+        public TaxiAuth(StatelessServiceContext context, Contracts.Database.IData dbService)
+            : base(context)
         {
             this.dbService = dbService;
         }
+
+        #region AuthMethods
 
         public async Task<UserProfile> GetUserProfile(Guid id)
         {
@@ -46,7 +57,7 @@ namespace BussinesLogic.Implementations
                     };
                     if (existingUser.Type == UserType.ADMIN)
                     {
-                        res.roleId = ((Admin)existingUser).AdminId;  
+                        res.roleId = ((Admin)existingUser).AdminId;
                     }
                     else if (existingUser.Type == UserType.CLIENT)
                     {
@@ -56,7 +67,7 @@ namespace BussinesLogic.Implementations
                     {
                         res.roleId = ((Driver)existingUser).DriverId;
                     }
-                    return res; 
+                    return res;
                 }
             }
 
@@ -82,7 +93,7 @@ namespace BussinesLogic.Implementations
                 newDriver.DriverId = Guid.NewGuid();
                 return await dbService.CreateDriver(newDriver);
             }
-            else if (userProfile.Type == UserType.CLIENT) 
+            else if (userProfile.Type == UserType.CLIENT)
             {
                 var newClient = new Models.UserTypes.Client(userProfile);
                 newClient.ClientId = Guid.NewGuid();
@@ -96,5 +107,42 @@ namespace BussinesLogic.Implementations
         {
             return await dbService.UpdateUserProfile(updateUserProfileRequest, id);
         }
+
+        #endregion
+
+        #region ServiceFabricMethods
+        /// <summary>
+        /// Optional override to create listeners (e.g., TCP, HTTP) for this service replica to handle client or user requests.
+        /// </summary>
+        /// <returns>A collection of listeners.</returns>
+        protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
+        {
+            return this.CreateServiceRemotingInstanceListeners();
+        }
+
+        /// <summary>
+        /// This is the main entry point for your service instance.
+        /// </summary>
+        /// <param name="cancellationToken">Canceled when Service Fabric needs to shut down this service instance.</param>
+        protected override async Task RunAsync(CancellationToken cancellationToken)
+        {
+            // TODO: Replace the following sample code with your own logic 
+            //       or remove this RunAsync override if it's not needed in your service.
+
+            long iterations = 0;
+
+            while (true)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+
+                ServiceEventSource.Current.ServiceMessage(this.Context, "Working-{0}", ++iterations);
+
+                await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
+            }
+        }
+
+
+        #endregion
+
     }
 }

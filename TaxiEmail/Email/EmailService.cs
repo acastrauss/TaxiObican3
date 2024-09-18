@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
-namespace BussinesLogic.Email
+namespace TaxiEmail.Email
 {
     public class EmailService : Contracts.Email.IEmailService
     {

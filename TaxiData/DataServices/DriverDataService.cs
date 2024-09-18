@@ -108,13 +108,21 @@ namespace TaxiData.DataServices
             }
             
             var totalAvg = 0.0f;
+            var totalRatedCnt = 0;
             foreach (var ride in driverRides)
             {
                 var ratings = await GetRatingsForRide(ride.Id, txWrapper.transaction);
+                if (!ratings.Any()) continue;
+                totalRatedCnt++;
                 totalAvg += (float)ratings.Average(rating => rating.Value);
             }
 
-            return totalAvg / driverRides.Count();
+            if(totalRatedCnt == 0)
+            {
+                return 0;
+            }
+
+            return totalAvg / totalRatedCnt;
         }
 
         private async Task<IEnumerable<Ride>> GetDriverRides(Guid driverId, ITransaction tx)

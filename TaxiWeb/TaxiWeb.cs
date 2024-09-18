@@ -22,6 +22,8 @@ using TaxiWeb.ConfigModels;
 using TaxiWeb.Services;
 using Microsoft.EntityFrameworkCore;
 using DatabaseAccess.Context;
+using Contracts.Auth;
+using Contracts.Email;
 
 namespace TaxiWeb
 {
@@ -94,20 +96,16 @@ namespace TaxiWeb
                         var azureConnString = builder.Configuration.GetSection("AzureStorage").GetValue<string>("ConnectionString");
                         builder.Services.AddSingleton<Contracts.Blob.IBlob>(new AzureInterface.AzureBlobCRUD(azureConnString, "profile-images"));
 
-
-
-                        //var mssqlConnectionString = builder.Configuration.GetConnectionString("SqlServer");
-                        //Action<DbContextOptionsBuilder> dbOptionsBuilder = o => o
-                        //    .UseLazyLoadingProxies()
-                        //    .UseSqlServer(mssqlConnectionString);
-                        //builder.Services.AddDbContext<TaxiDBContext>(dbOptionsBuilder);
-                        //var dataContext = builder.Services.BuildServiceProvider().GetRequiredService<TaxiDBContext>();
-                        //dataContext.Database.EnsureCreated();
-
                         builder.Services.AddSingleton<StatelessServiceContext>(serviceContext);
                         
                         var proxy = ServiceProxy.Create<IBussinesLogic>(new Uri("fabric:/TaxiApplication/BussinesLogic"));
                         builder.Services.AddSingleton<IBussinesLogic>(proxy);
+
+                        var proxyAuth = ServiceProxy.Create<IAuthLogic>(new Uri("fabric:/TaxiApplication/TaxiAuth"));
+                        builder.Services.AddSingleton<IAuthLogic>(proxyAuth);
+
+                        var proxyEmail = ServiceProxy.Create<IEmailService>(new Uri("fabric:/TaxiApplication/TaxiEmail"));
+                        builder.Services.AddSingleton<IEmailService>(proxyEmail);
 
                         builder.Services.AddSingleton<IRequestAuth, RequestAuth>();
 
