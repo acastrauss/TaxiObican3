@@ -90,9 +90,7 @@ namespace TaxiWeb
                             });
 
 
-                        builder.Services.Configure<JWTConfig>(builder.Configuration.GetSection("JWT"));
-                        var jwtSecret = builder.Configuration.GetSection("JWT").GetValue<string>("Secret");
-
+                        
                         var azureConnString = builder.Configuration.GetSection("AzureStorage").GetValue<string>("ConnectionString");
                         builder.Services.AddSingleton<Contracts.Blob.IBlob>(new AzureInterface.AzureBlobCRUD(azureConnString, "profile-images"));
 
@@ -108,7 +106,9 @@ namespace TaxiWeb
                         builder.Services.AddSingleton<IEmailService>(proxyEmail);
 
                         builder.Services.AddSingleton<IRequestAuth, RequestAuth>();
-
+                       
+                        builder.Services.Configure<JWTConfig>(builder.Configuration.GetSection("JWT"));
+                        var jwtSecret = builder.Configuration.GetSection("JWT").GetValue<string>("Secret");
                         var jwtAudience = builder.Configuration.GetSection("JWT").GetValue<string>("Audience");
                         var jwtIssuer = builder.Configuration.GetSection("JWT").GetValue<string>("Issuer");
 
@@ -129,20 +129,6 @@ namespace TaxiWeb
                                 ValidIssuer = jwtIssuer,
                                 ValidAudience = jwtAudience,
                                 IssuerSigningKey = new SymmetricSecurityKey(key),
-                            };
-
-                            x.Events = new JwtBearerEvents
-                            {
-                                OnMessageReceived = context =>
-                                {
-                                    var accessToken = context.Request.Query["access_token"];
-                                    var path = context.HttpContext.Request.Path;
-                                    if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/chathub"))
-                                    {
-                                        context.Token = accessToken;
-                                    }
-                                    return Task.CompletedTask;
-                                }
                             };
                         });
                         

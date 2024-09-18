@@ -20,7 +20,7 @@ namespace DatabaseAccess.CRUD
         public async Task AddOrUpdateMultipleEntities(IEnumerable<TDB> entities)
         {
             using var dbCtx = DBContextFactory.Instance.GetDBContext();
-
+            
             foreach (var entity in entities)
             {
                 if (dbCtx.Set<TDB>().Any(e => e.Id == entity.Id))
